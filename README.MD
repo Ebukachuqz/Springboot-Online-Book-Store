@@ -58,12 +58,17 @@ The application is configured via the `application.properties` file in `src/main
 
 ```properties
 spring.application.name=Online Book Store
+
 server.port=8080
 spring.datasource.url=jdbc:h2:mem:bookstore
 spring.datasource.username=sa
 spring.datasource.password=
-spring.jpa.hibernate.ddl-auto=update
+
 spring.jpa.show-sql=true
+spring.jpa.defer-datasource-initialization=true
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.sql.init.mode=always
+
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2-console
 ```

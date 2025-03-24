@@ -21,17 +21,15 @@ public class PaymentService {
         payment.setTransactionReference(generateTransactionReference());
 
         // Simulate payment processing based on method
-        switch (paymentMethod) {
-            case WEB:
-                return simulateWebPayment(payment);
-            case USSD:
-                return simulateUssdPayment(payment);
-            case TRANSFER:
-                return simulateTransferPayment(payment);
-            default:
+        return switch (paymentMethod) {
+            case WEB -> simulateWebPayment(payment);
+            case USSD -> simulateUssdPayment(payment);
+            case TRANSFER -> simulateTransferPayment(payment);
+            default -> {
                 payment.setStatus(PaymentStatus.FAILED);
-                return payment;
-        }
+                yield payment;
+            }
+        };
     }
 
     private Payment simulateWebPayment(Payment payment) {

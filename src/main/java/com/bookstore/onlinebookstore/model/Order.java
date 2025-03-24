@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.CascadeType;
 import lombok.Data;
 
@@ -31,8 +32,9 @@ public class Order {
     private LocalDateTime orderDate;
     private double totalAmount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Payment payment;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

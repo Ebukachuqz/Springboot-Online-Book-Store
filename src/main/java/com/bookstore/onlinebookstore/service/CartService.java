@@ -17,17 +17,19 @@ public class CartService {
     private final BookRepository bookRepository;
     private final CartRepository cartRepository;
 
-    @Transactional
-    public Cart getOrCreateCart(User user){
-        return cartRepository.findByUserId(user.getId()).orElseGet(()->{
-            Cart cart = new Cart();
-            cart.setUser(user);
-            return cartRepository.save(cart);
+    @Transactional(readOnly = true)
+    public Cart getOrCreateUserCart(User user){
+        return cartRepository
+                .findByUserId(user.getId())
+                .orElseGet(()->{
+                    Cart cart = new Cart();
+                    cart.setUser(user);
+                    return cartRepository.save(cart);
         });
     }
 
     @Transactional
-    public Cart addToCart(Long userId, Long bookId, int quantity){
+    public Cart addBookToCart(Long userId, Long bookId, int quantity){
         Cart userCart = cartRepository.
                 findByUserId(userId)
                 .orElseThrow(()->new RuntimeException("User not found")); // !TODO: modify this exception
@@ -57,7 +59,7 @@ public class CartService {
     }
 
     @Transactional
-    public Cart removeFromCart(Long userId, Long bookId){
+    public Cart removeBookFromCart(Long userId, Long bookId){
         Cart userCart = cartRepository
                 .findByUserId(userId)
                 .orElseThrow(()-> new RuntimeException("Cart not found for user with id: " + userId)); // !TODO: modify this exception

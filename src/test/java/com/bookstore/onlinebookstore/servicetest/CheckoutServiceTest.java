@@ -1,9 +1,10 @@
 package com.bookstore.onlinebookstore.servicetest;
 
 import com.bookstore.onlinebookstore.model.*;
-import com.bookstore.onlinebookstore.repository.CartRepository;
-import com.bookstore.onlinebookstore.repository.OrderRepository;
+import com.bookstore.onlinebookstore.service.CartService;
 import com.bookstore.onlinebookstore.service.CheckoutService;
+import com.bookstore.onlinebookstore.service.OrderService;
+import com.bookstore.onlinebookstore.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,22 +21,25 @@ import static org.mockito.Mockito.*;
 class CheckoutServiceTest {
 
     @Mock
-    private CartRepository cartRepository;
+    private CartService cartService;
 
     @Mock
-    private OrderRepository orderRepository;
+    private OrderService orderService;
+
+    @Mock
+    private PaymentService paymentService;
 
     @InjectMocks
     private CheckoutService checkoutService;
 
     @Test
-    void checkout_withItemsInCart_createsOrderAndClearsCart() {
+    void checkout_withNonEmptyCart_createsOrderAndClearsCart() {
         // Arrange
         User user = new User();
         user.setId(1L);
 
         Book book = new Book();
-        book.setId(1L);
+        book.setId(2L);
         book.setPrice(10.0);
 
         CartItem cartItem = new CartItem();
@@ -47,28 +50,31 @@ class CheckoutServiceTest {
         cart.setUser(user);
         cart.getItems().add(cartItem);
 
-        // Assuming getOrCreateUserCart is called and returns our cart
-        when(cartRepository.findByUserId(user.getId())).thenReturn(Optional.of(cart));
-        when(orderRepository.save(any(Order.class))).thenAnswer(i -> {
-            Order order = i.getArgument(0);
-            order.setId(1L);
-            return order;
+        Order order = new Order();
+        order.setItems(new ArrayList<>());
+
+        Payment payment = new Payment();
+        payment.setStatus(PaymentStatus.COMPLETED);
+
+        when(cartService.getOrCreateUserCart(user)).thenReturn(cart);
+        when(orderService.createOrder(user)).thenReturn(order);
+        when(paymentService.processPayment(20.0, PaymentMethod.WEB)).thenReturn(payment);
+        when(orderService.saveOrder(any(Order.class))).thenAnswer(inv -> {
+            Order savedOrder = inv.getArgument(0);
+            savedOrder.setId(10L);
+            return savedOrder;
         });
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
         // Act
         Order result = checkoutService.checkout(user, PaymentMethod.WEB);
 
         // Assert
         assertNotNull(result);
-        assertEquals(user.getId(), result.getUser().getId());
-        // You may also assert that payment is set if PaymentStatus is COMPLETED
+        assertEquals(10L, result.getId());
         assertEquals(OrderStatus.PAID, result.getStatus());
         assertEquals(1, result.getItems().size());
-        assertTrue(cart.getItems().isEmpty());
 
-        verify(orderRepository).save(any(Order.class));
-        verify(cartRepository).save(cart);
+        verify(cartService).clearCart(user.getId());
     }
 
     @Test
@@ -78,15 +84,31 @@ class CheckoutServiceTest {
         user.setId(1L);
 
         Cart cart = new Cart();
+        cart.setUser(user);
         cart.setItems(new ArrayList<>());
 
-        when(cartRepository.findByUserId(user.getId())).thenReturn(Optional.of(cart));
+        when(cartService.getOrCreateUserCart(user)).thenReturn(cart);
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                checkoutService.checkout(user, PaymentMethod.WEB)
-        );
+                checkoutService.checkout(user, PaymentMethod.WEB));
+        verify(orderService, never()).createOrder(any(User.class));
+    }
 
-        verify(orderRepository, never()).save(any());
+    @Test
+    void checkoutFallback_returnsCancelledOrder() {
+        // Arrange
+        User user = new User();
+        user.setId(1L);
+
+        Exception exception = new RuntimeException("Simulated failure");
+
+        // Act
+        Order fallbackOrder = checkoutService.checkoutFallback(user, exception);
+
+        // Assert
+        assertNotNull(fallbackOrder);
+        assertEquals(OrderStatus.CANCELLED, fallbackOrder.getStatus());
+        assertEquals(user, fallbackOrder.getUser());
     }
 }

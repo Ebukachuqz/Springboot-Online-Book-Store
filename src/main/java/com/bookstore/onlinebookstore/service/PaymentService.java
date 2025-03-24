@@ -20,6 +20,11 @@ public class PaymentService {
         payment.setPaymentDate(LocalDateTime.now());
         payment.setTransactionReference(generateTransactionReference());
 
+        if (paymentMethod == null) {
+            payment.setStatus(PaymentStatus.FAILED);
+            return payment;
+        }
+
         // Simulate payment processing based on method
         return switch (paymentMethod) {
             case WEB -> simulateWebPayment(payment);

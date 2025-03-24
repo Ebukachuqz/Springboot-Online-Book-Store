@@ -1,18 +1,15 @@
 package com.bookstore.onlinebookstore.model;
 
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "books")
 public class Book {
 
     @Id
@@ -20,7 +17,7 @@ public class Book {
     private Long id;
 
     @NotBlank(message = "Title cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Title can only contain Numbers and Letters")
+    @Pattern(regexp = "^[a-zA-Z0-9\\s]+$", message = "Title can only contain Numbers and Letters")
     private String title;
 
     @NotBlank(message = "ISBN cannot be blank")
@@ -30,7 +27,7 @@ public class Book {
     @NotBlank(message = "Author cannot be blank")
     private String author;
 
-    @NotBlank(message = "Please provide year of publication")
+    @NotNull(message = "Please provide year of publication")
     private int publicationYear;
 
     @Enumerated(EnumType.STRING)

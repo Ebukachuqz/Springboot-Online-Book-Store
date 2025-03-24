@@ -1,4 +1,4 @@
-package com.bookstore.onlinebookstore.controllers;
+package com.bookstore.onlinebookstore.controller;
 
 import com.bookstore.onlinebookstore.model.Order;
 import com.bookstore.onlinebookstore.model.PaymentMethod;

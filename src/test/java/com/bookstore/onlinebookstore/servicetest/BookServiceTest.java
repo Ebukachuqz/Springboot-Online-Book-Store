@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,40 +30,62 @@ class BookServiceTest {
     @Test
     void getBookById_whenBookExists_returnsBook() {
         // Arrange
+        Long bookId = 1L;
         Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Test Book");
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        book.setId(bookId);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
         // Act
-        Book result = bookService.getBookById(1L);
+        Book result = bookService.getBookById(bookId);
 
         // Assert
-        assertEquals("Test Book", result.getTitle());
-        verify(bookRepository).findById(1L);
+        assertNotNull(result);
+        assertEquals(bookId, result.getId());
+        verify(bookRepository).findById(bookId);
     }
 
     @Test
     void getBookById_whenBookDoesNotExist_throwsException() {
         // Arrange
-        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+        Long bookId = 1L;
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(1L));
-        verify(bookRepository).findById(1L);
+        assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(bookId));
+        verify(bookRepository).findById(bookId);
     }
 
     @Test
-    void searchBooks_returnsMatchingBooks() {
+    void getAllBooks_returnsAllBooks() {
         // Arrange
-        List<Book> expectedBooks = Arrays.asList(new Book(), new Book());
-        when(bookRepository.searchBooks(any(), any(), any(), any())).thenReturn(expectedBooks);
+        List<Book> books = Arrays.asList(new Book(), new Book());
+        when(bookRepository.findAll()).thenReturn(books);
 
         // Act
-        List<Book> result = bookService.searchBooks("title", "author", 2023, Genre.FICTION);
+        List<Book> result = bookService.getAllBooks();
 
         // Assert
         assertEquals(2, result.size());
-        verify(bookRepository).searchBooks("title", "author", 2023, Genre.FICTION);
+        verify(bookRepository).findAll();
+    }
+
+    @Test
+    void searchBooks_returnsMatchedBooks() {
+        // Arrange
+        String title = "test";
+        String author = "author";
+        Integer year = 2023;
+        Genre genre = Genre.FICTION;
+
+        List<Book> matchedBooks = Arrays.asList(new Book(), new Book());
+        when(bookRepository.searchBooks(title, author, year, genre)).thenReturn(matchedBooks);
+
+        // Act
+        List<Book> result = bookService.searchBooks(title, author, year, genre);
+
+        // Assert
+        assertEquals(matchedBooks.size(), result.size());
+        verify(bookRepository).searchBooks(title, author, year, genre);
     }
 }

@@ -1,4 +1,4 @@
-package com.bookstore.onlinebookstore.controllerstest;
+package com.bookstore.onlinebookstore.controller;
 
 import com.bookstore.onlinebookstore.model.Book;
 import com.bookstore.onlinebookstore.model.Genre;

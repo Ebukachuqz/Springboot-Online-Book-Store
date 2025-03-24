@@ -64,7 +64,7 @@ public class CheckoutService {
     }
 
     // Fallback method for circuit breaker
-    public Order checkoutFallback(User user, PaymentMethod paymentMethod, Exception e) {
+    public Order checkoutFallback(User user, Exception e) {
         Order fallbackOrder = new Order();
         fallbackOrder.setStatus(OrderStatus.CANCELLED);
         fallbackOrder.setOrderDate(LocalDateTime.now());

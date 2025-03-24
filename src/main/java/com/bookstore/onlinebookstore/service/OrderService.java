@@ -17,7 +17,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public List<Order> getUserOrders(Long userId) {
+    public List<Order> getUserOrderHistory(Long userId) {
         return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
     }
 

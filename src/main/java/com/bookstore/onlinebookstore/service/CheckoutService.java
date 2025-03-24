@@ -23,7 +23,7 @@ public class CheckoutService {
         Cart cart = cartService.getOrCreateUserCart(user);
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cannot checkout with an empty cart"); // !TODO: Modify
+            throw new IllegalStateException("Cannot checkout with empty cart");
         }
 
         // Create a new order

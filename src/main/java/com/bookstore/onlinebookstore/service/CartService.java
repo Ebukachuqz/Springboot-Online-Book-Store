@@ -1,5 +1,6 @@
 package com.bookstore.onlinebookstore.service;
 
+import com.bookstore.onlinebookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.onlinebookstore.model.Book;
 import com.bookstore.onlinebookstore.model.Cart;
 import com.bookstore.onlinebookstore.model.CartItem;
@@ -32,11 +33,11 @@ public class CartService {
     public Cart addBookToCart(Long userId, Long bookId, int quantity){
         Cart userCart = cartRepository.
                 findByUserId(userId)
-                .orElseThrow(()->new RuntimeException("User not found")); // !TODO: modify this exception
+                .orElseThrow(()->new ResourceNotFoundException("Cart not found for user with id: " + userId));
 
         Book book = bookRepository
                 .findById(bookId)
-                .orElseThrow(()->new RuntimeException("Book not found")); // !TODO: modify this exception
+                .orElseThrow(()->new ResourceNotFoundException("Book not found with id: " + bookId));
 
         // check if book already exists in Cart
         CartItem existingCartItem = userCart.getItems().stream()
@@ -62,7 +63,7 @@ public class CartService {
     public Cart removeBookFromCart(Long userId, Long bookId){
         Cart userCart = cartRepository
                 .findByUserId(userId)
-                .orElseThrow(()-> new RuntimeException("Cart not found for user with id: " + userId)); // !TODO: modify this exception
+                .orElseThrow(()-> new ResourceNotFoundException("Cart not found for user with id: " + userId));
 
         userCart.getItems().removeIf(item -> item.getBook().getId().equals(bookId));
         return cartRepository.save(userCart);
@@ -71,7 +72,7 @@ public class CartService {
     @Transactional
     public Cart clearCart(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found for user with id: " + userId)); // !TODO: modify this exception
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user with id: " + userId));
 
         cart.getItems().clear();
         return cartRepository.save(cart);

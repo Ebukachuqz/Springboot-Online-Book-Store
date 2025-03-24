@@ -1,5 +1,6 @@
 package com.bookstore.onlinebookstore.service;
 
+import com.bookstore.onlinebookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.onlinebookstore.model.Order;
 import com.bookstore.onlinebookstore.model.OrderStatus;
 import com.bookstore.onlinebookstore.model.User;
@@ -23,7 +24,7 @@ public class OrderService {
 
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId)); //!TODO: Modify
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
     }
 
     public Order createOrder(User user) {

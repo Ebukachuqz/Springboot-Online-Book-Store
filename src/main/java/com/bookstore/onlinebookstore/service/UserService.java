@@ -36,8 +36,4 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
     }
 
-    public Optional<User> findUserById(Long userId) {
-        return userRepository.findById(userId);
-    }
-
 }

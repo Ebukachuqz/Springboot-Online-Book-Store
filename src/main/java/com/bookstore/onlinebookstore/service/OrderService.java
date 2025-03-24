@@ -7,7 +7,6 @@ import com.bookstore.onlinebookstore.model.User;
 import com.bookstore.onlinebookstore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -45,7 +45,7 @@ public class CheckoutService {
         order.setTotalAmount(totalAmount);
 
         // Process payment
-        Payment payment = processPayment(user, totalAmount, paymentMethod);
+        Payment payment = processPayment(totalAmount, paymentMethod);
         order.setPayment(payment);
 
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
@@ -59,7 +59,7 @@ public class CheckoutService {
         return savedOrder;
     }
 
-    private Payment processPayment(User user, double amount, PaymentMethod paymentMethod) {
+    private Payment processPayment(double amount, PaymentMethod paymentMethod) {
         return paymentService.processPayment(amount, paymentMethod);
     }
 

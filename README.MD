@@ -29,8 +29,8 @@ A Book store application built with Spring Boot and Java.
 
 1. **Clone the repository:**
    ```bash
-   git clone ...
-   cd ...
+   git clone https://github.com/Ebukachuqz/Springboot-Online-Book-Store
+   cd Springboot-Online-Book-Store
    ```
 
 2. **Build the application:**
